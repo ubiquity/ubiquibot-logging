@@ -12,7 +12,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "types": ["@cloudflare/workers-types", "node"],
-    "outDir": "scripts/out"
+    "outDir": "build"
   },
-  "include": ["./_worker.ts", "./src", "./types", "./scripts", "./index.ts"]
+  "include": ["./types", "./scripts"]
 }

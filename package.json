@@ -6,10 +6,10 @@
   "author": "Ubiquity DAO",
   "license": "MIT",
   "engines": {
-    "node": ">=v20.8.0"
+    "node": ">=v18.0.0"
   },
   "scripts": {
-    "build": "tsc && tsx ./scripts/esbuild.ts",
+    "build": "tsx ./esbuild.ts",
     "format": "run-s format:prettier format:lint",
     "format:lint": "eslint --fix .",
     "format:prettier": "prettier --write ."
