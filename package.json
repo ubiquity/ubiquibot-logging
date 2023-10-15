@@ -9,10 +9,11 @@
     "node": ">=v18.0.0"
   },
   "scripts": {
-    "build": "tsx ./esbuild.ts",
+    "build:prod": "tsx ./esbuild/esbuild.prod.ts",
     "format": "run-s format:prettier format:lint",
     "format:lint": "eslint --fix .",
-    "format:prettier": "prettier --write ."
+    "format:prettier": "prettier --write .",
+    "start": "tsx ./esbuild/esbuild.dev.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.2.0",
