@@ -30,7 +30,7 @@ jobs:
         run: yarn build:prod
 
       - name: Add commit SHA file to build folder
-        run: echo -n $(echo "${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) > scripts/out/commit.txt
+        run: echo -n $(echo "${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) > build/commit.txt
 
       - name: Prepare Deployment Artifact
         env:
