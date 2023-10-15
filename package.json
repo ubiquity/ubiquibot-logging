@@ -6,13 +6,14 @@
   "author": "Ubiquity DAO",
   "license": "MIT",
   "engines": {
-    "node": ">=v20.8.0"
+    "node": ">=v18.0.0"
   },
   "scripts": {
-    "build": "tsc && tsx ./scripts/esbuild.ts",
+    "build:prod": "tsx ./esbuild/esbuild.prod.ts",
     "format": "run-s format:prettier format:lint",
     "format:lint": "eslint --fix .",
-    "format:prettier": "prettier --write ."
+    "format:prettier": "prettier --write .",
+    "start": "tsx ./esbuild/esbuild.dev.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.2.0",
