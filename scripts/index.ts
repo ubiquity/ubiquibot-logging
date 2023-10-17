@@ -76,13 +76,13 @@ const fetchData = async () => {
       .order("timestamp", { ascending: false })
       .limit(25);
     if (data && data.length > 0) {
-      logs.unshift(...data);
+      logs.unshift(...data.reverse());
       updateLogTable(true);
     } else console.log(error);
   } else {
     const { data, error } = await supabaseClient.from("logs").select().order("timestamp", { ascending: false }).limit(30);
     if (data && data.length > 0) {
-      logs.push(...data);
+      logs.push(...data.reverse());
       updateLogTable(true);
     } else console.log(error);
   }
