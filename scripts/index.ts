@@ -68,14 +68,19 @@ const fetchData = async () => {
   isLoading = true;
 
   if (logs.length > 0) {
-    const firstAvailableLogId = logs.at(0)?.id;
-    const { data, error } = await supabaseClient.from("logs").select().lt("id", firstAvailableLogId).limit(25);
+    const firstAvailableTimestamp = logs.at(0)?.timestamp;
+    const { data, error } = await supabaseClient
+      .from("logs")
+      .select()
+      .lt("timestamp", firstAvailableTimestamp)
+      .order("timestamp", { ascending: false })
+      .limit(25);
     if (data && data.length > 0) {
       logs.unshift(...data);
       updateLogTable(true);
     } else console.log(error);
   } else {
-    const { data, error } = await supabaseClient.from("logs").select().order("id", { ascending: false }).limit(30);
+    const { data, error } = await supabaseClient.from("logs").select().order("timestamp", { ascending: false }).limit(30);
     if (data && data.length > 0) {
       logs.push(...data);
       updateLogTable(true);
