@@ -135,6 +135,7 @@ window.addEventListener("click", (event) => {
   if (event.target === jsonModal) {
     jsonModal.style.display = "none";
   }
+  isLoading = !isLoading;
 });
 
 // Initial update
