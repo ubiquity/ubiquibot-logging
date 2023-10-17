@@ -1,5 +1,6 @@
 import { containsValidJson, createGitHubCommentURL, generateRandomId, getLevelString } from "./helpers/utils";
 import { Logs } from "./types/log";
+import { Database } from "../types/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY } from "./constants/index";
 
@@ -11,13 +12,15 @@ const jsonModal = document.getElementById("json-modal") as HTMLDivElement;
 const closeModalButton = document.getElementById("close-modal") as HTMLButtonElement;
 const jsonContent = document.getElementById("json-content") as HTMLDivElement;
 
+let isLoading = false;
+
 const openJsonModal = (validJson: string) => {
   jsonContent.textContent = validJson;
 
   jsonModal.style.display = "flex";
 };
 
-const updateLogTable = () => {
+const updateLogTable = (scrollUp = false) => {
   const selectedFilter = filterSelect.value;
   const filteredLogs = selectedFilter === "all" ? logs : logs.filter((log) => getLevelString(log.level) === selectedFilter);
 
@@ -49,13 +52,38 @@ const updateLogTable = () => {
       });
     }
     // scroll to last added data
-    logCell[logCell.length - 1].scrollIntoView();
+    if (scrollUp) {
+      logCell[0].scrollIntoView();
+    } else {
+      logCell[logCell.length - 1].scrollIntoView();
+    }
   });
 };
 
 let logs: Logs[] = [];
 
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_KEY);
+
+const fetchData = async () => {
+  isLoading = true;
+
+  const firstAvailableLogId = logs.at(0)?.id;
+  const { data, error } = await supabaseClient.from("logs").select().lt("id", firstAvailableLogId).limit(25);
+  if (data && data.length > 0) {
+    logs.unshift(...data);
+    updateLogTable(true);
+  } else console.log(error);
+  isLoading = false;
+};
+
+const handleScroll = async () => {
+  if (document.documentElement.scrollTop !== 0 || isLoading) {
+    return;
+  }
+  await fetchData();
+};
+
+window.addEventListener("scroll", handleScroll);
 
 supabaseClient
   .channel("table-db-changes")
