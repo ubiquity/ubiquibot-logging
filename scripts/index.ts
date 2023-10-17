@@ -67,12 +67,21 @@ const supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_KEY);
 const fetchData = async () => {
   isLoading = true;
 
-  const firstAvailableLogId = logs.at(0)?.id;
-  const { data, error } = await supabaseClient.from("logs").select().lt("id", firstAvailableLogId).limit(25);
-  if (data && data.length > 0) {
-    logs.unshift(...data);
-    updateLogTable(true);
-  } else console.log(error);
+  if (logs.length > 0) {
+    const firstAvailableLogId = logs.at(0)?.id;
+    const { data, error } = await supabaseClient.from("logs").select().lt("id", firstAvailableLogId).limit(25);
+    if (data && data.length > 0) {
+      logs.unshift(...data);
+      updateLogTable(true);
+    } else console.log(error);
+  } else {
+    const { data, error } = await supabaseClient.from("logs").select().order("id", { ascending: false }).limit(30);
+    if (data && data.length > 0) {
+      logs.push(...data);
+      updateLogTable(true);
+    } else console.log(error);
+  }
+
   isLoading = false;
 };
 
@@ -124,4 +133,5 @@ window.addEventListener("click", (event) => {
 });
 
 // Initial update
+fetchData();
 updateLogTable();
