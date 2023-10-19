@@ -20,7 +20,7 @@ const openJsonModal = (validJson: string) => {
   jsonModal.style.display = "flex";
 };
 
-const updateLogTable = (scrollUp = false) => {
+const updateLogTable = () => {
   const selectedFilter = filterSelect.value;
   const filteredLogs = selectedFilter === "all" ? logs : logs.filter((log) => getLevelString(log.level) === selectedFilter);
 
@@ -51,12 +51,6 @@ const updateLogTable = (scrollUp = false) => {
         }
       });
     }
-    // scroll to last added data
-    if (scrollUp) {
-      logCell[0].scrollIntoView();
-    } else {
-      logCell[logCell.length - 1].scrollIntoView();
-    }
   });
 };
 
@@ -68,7 +62,7 @@ const fetchData = async () => {
   isLoading = true;
 
   if (logs.length > 0) {
-    const firstAvailableTimestamp = logs.at(0)?.timestamp;
+    const firstAvailableTimestamp = logs.at(logs.length-1)?.timestamp;
     const { data, error } = await supabaseClient
       .from("logs")
       .select()
@@ -76,14 +70,14 @@ const fetchData = async () => {
       .order("timestamp", { ascending: false })
       .limit(25);
     if (data && data.length > 0) {
-      logs.unshift(...data.reverse());
-      updateLogTable(true);
+      logs.push(...data);
+      updateLogTable();
     } else console.log(error);
   } else {
     const { data, error } = await supabaseClient.from("logs").select().order("timestamp", { ascending: false }).limit(30);
     if (data && data.length > 0) {
-      logs.push(...data.reverse());
-      updateLogTable(true);
+      logs.push(...data);
+      updateLogTable();
     } else console.log(error);
   }
 
@@ -91,7 +85,9 @@ const fetchData = async () => {
 };
 
 const handleScroll = async () => {
-  if (document.documentElement.scrollTop !== 0 || isLoading) {
+  const bottom = document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight;
+
+  if (!bottom || isLoading) {
     return;
   }
   await fetchData();
@@ -114,7 +110,7 @@ supabaseClient
 
 const handlePayload = (logEntry: any) => {
   if (logEntry?.eventType !== "INSERT") return;
-  logs.push(logEntry.new);
+  logs.unshift(logEntry.new);
   updateLogTable();
 };
 
