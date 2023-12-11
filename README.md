@@ -1,4 +1,4 @@
-# Ubiquibot-logging App
+# Ubiquibot-logging App!
 
 Frontend app that displays [ubiquibot](https://github.com/ubiquity/ubiquibot) realtime logs for debug purposes.
 
