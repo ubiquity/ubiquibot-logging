@@ -1,9 +1,10 @@
 export type Logs = {
-  timestamp: string;
-  log_message: string;
-  level: number;
-  repo_name: string;
-  org_name: string;
-  comment_id: number;
-  issue_number: number;
+  comment_id: number | null;
+  id: number;
+  issue_number: number | null;
+  level: number | null;
+  log_message: string | null;
+  org_name: string | null;
+  repo_name: string | null;
+  timestamp: string | null;
 };

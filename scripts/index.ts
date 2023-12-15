@@ -1,5 +1,6 @@
 import { containsValidJson, createGitHubCommentURL, generateRandomId, getLevelString } from "./helpers/utils";
 import { Logs } from "./types/log";
+import { Database } from "../types/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY } from "./constants/index";
 
@@ -10,6 +11,8 @@ const logBody = document.getElementById("log-body") as HTMLDivElement;
 const jsonModal = document.getElementById("json-modal") as HTMLDivElement;
 const closeModalButton = document.getElementById("close-modal") as HTMLButtonElement;
 const jsonContent = document.getElementById("json-content") as HTMLDivElement;
+
+let isLoading = false;
 
 const openJsonModal = (validJson: string) => {
   jsonContent.textContent = validJson;
@@ -48,14 +51,49 @@ const updateLogTable = () => {
         }
       });
     }
-    // scroll to last added data
-    logCell[logCell.length - 1].scrollIntoView();
   });
 };
 
 let logs: Logs[] = [];
 
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_KEY);
+
+const fetchData = async () => {
+  isLoading = true;
+
+  if (logs.length > 0) {
+    const firstAvailableTimestamp = logs.at(logs.length-1)?.timestamp;
+    const { data, error } = await supabaseClient
+      .from("logs")
+      .select()
+      .lt("timestamp", firstAvailableTimestamp)
+      .order("timestamp", { ascending: false })
+      .limit(25);
+    if (data && data.length > 0) {
+      logs.push(...data);
+      updateLogTable();
+    } else console.log(error);
+  } else {
+    const { data, error } = await supabaseClient.from("logs").select().order("timestamp", { ascending: false }).limit(30);
+    if (data && data.length > 0) {
+      logs.push(...data);
+      updateLogTable();
+    } else console.log(error);
+  }
+
+  isLoading = false;
+};
+
+const handleScroll = async () => {
+  const bottom = document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight;
+
+  if (!bottom || isLoading) {
+    return;
+  }
+  await fetchData();
+};
+
+window.addEventListener("scroll", handleScroll);
 
 supabaseClient
   .channel("table-db-changes")
@@ -72,7 +110,7 @@ supabaseClient
 
 const handlePayload = (logEntry: any) => {
   if (logEntry?.eventType !== "INSERT") return;
-  logs.push(logEntry.new);
+  logs.unshift(logEntry.new);
   updateLogTable();
 };
 
@@ -93,7 +131,9 @@ window.addEventListener("click", (event) => {
   if (event.target === jsonModal) {
     jsonModal.style.display = "none";
   }
+  isLoading = !isLoading;
 });
 
 // Initial update
+fetchData();
 updateLogTable();

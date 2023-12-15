@@ -8,7 +8,7 @@ export enum Level {
   SILLY = "silly",
 }
 
-export const createGitHubCommentURL = (orgName: string, repoName: string, issueNumber: number, commentId: number) => {
+export const createGitHubCommentURL = (orgName: string | null, repoName: string | null, issueNumber: number | null, commentId: number | null) => {
   return `https://github.com/${orgName}/${repoName}/issues/${issueNumber}#issuecomment-${commentId}`;
 };
 
@@ -21,21 +21,21 @@ export const isValidJson = (jsonString: string): boolean => {
   }
 };
 
-export const generateRandomId = (length: Number) => {
+export const generateRandomId = (length: number) => {
   return [...Array(length)].map(() => Math.random().toString(36)[2]).join("");
 };
 
-export const containsValidJson = (message: string): [boolean, string, string] => {
-  const jsonMatches = message.match(/\{.*\}/g); // Find JSON-like substrings
+export const containsValidJson = (message: string | null): [boolean, string, string | undefined] => {
+  const jsonMatches = message?.match(/\{.*\}/g); // Find JSON-like substrings
   if (!jsonMatches) {
     return [false, "", ""];
   }
 
   for (const match of jsonMatches) {
     if (isValidJson(match)) {
-      const braceIndex = message.indexOf("{");
+      const braceIndex = message?.indexOf("{");
       if (braceIndex !== -1) {
-        return [true, match, message.substring(0, braceIndex)];
+        return [true, match, message?.substring(0, braceIndex)];
       }
       return [true, match, ""];
     }
@@ -44,7 +44,7 @@ export const containsValidJson = (message: string): [boolean, string, string] =>
   return [false, "", ""];
 };
 
-export const getLevelString = (level: number) => {
+export const getLevelString = (level: number | null) => {
   switch (level) {
     case 0:
       return Level.ERROR;

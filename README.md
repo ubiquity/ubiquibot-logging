@@ -1,6 +1,6 @@
 # Ubiquibot-logging App
 
-Frontend app that displays [ubiquibot](https://github.com/ubiquity/ubiquibot) realtime logs for debug purposes.
+Web app that displays [ubiquibot](https://github.com/ubiquity/ubiquibot) realtime logs for debug purposes.
 
 ## How to setup:
 1. Set your project's `SUPABASE_URL` and `SUPABASE_KEY` (public anon key) [here](https://github.com/ubiquity/ubiquibot-logging/blob/0517dd0e898744e5ae4fe0b66ae5941ee8d87538/scripts/constants/index.ts)
